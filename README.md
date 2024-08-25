@@ -1,4 +1,5 @@
 Welcome to the Klipper project!
+This fork just make the generic fan option work as expected
 
 [![Klipper](docs/img/klipper-logo-small.png)](https://www.klipper3d.org/)
 
