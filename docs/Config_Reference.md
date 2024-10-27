@@ -4830,23 +4830,22 @@ ADS1013, ADS1014, ADS1015, ADS1113, ADS1114 and ADS1115 are I2C based Analog to
 Digital Converters that can be used for temperature sensors. They provide 4
 analog input pins either as single line or as differential input.
 
+Note: Use caution if using this sensor to control heaters. The heater min_temp
+and max_temp are only verified in the host and only if the host is running and
+operating normally. (ADC inputs directly connected to the micro-controller
+verify min_temp and max_temp within the micro-controller and do not require a
+working connection to the host.)
+
+The sample rate of the chip gets automatically calculated based on the number of
+pins used and the refresh rate requested by klipper.
+
 ```
 [ads1x1x my_ads1x1x]
 chip: ADS1115
-#pga: 6.144V
+#pga: 4.096V
 #   Default value is 4.096V. The maximum voltage range used for the input. This
 #   scales all values read from the ADC. Options are: 6.144V, 4.096V, 2.048V,
 #   1.024V, 0.512V, 0.256V
-#mode: single
-#    Default value is single. Turn off the chip after a single reading or keep
-#    it running. Turning off saves power but turning it back on will be slower.
-#    Options are single and continuous.
-#samples_per_second: 128
-#    Default value is 128. The amount of samples that the ADC can provide per
-#    second. A lower value makes the samples more accurate, but it takes longer
-#    until a new value is available.
-#    ADS101X's support 128, 250, 490, 920, 1600, 2400, 3300.
-#    ADS111X's support 8, 16, 32, 64, 128, 250, 475, 860.
 i2c_mcu: host
 i2c_bus: i2c.1
 #address_pin: GND
