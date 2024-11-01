@@ -395,9 +395,9 @@ micro-controller.
 | 1 stepper            | 85    |
 | 3 stepper            | 359   |
 
-### RP2040 step rate benchmark
+### RPxxxx step rate benchmark
 
-The following configuration sequence is used on the RP2040:
+The following configuration sequence is used on the RP2040 and RP2350:
 
 ```
 allocate_oids count=3
@@ -407,14 +407,19 @@ config_stepper oid=2 step_pin=gpio27 dir_pin=gpio5 invert_step=-1 step_pulse_tic
 finalize_config crc=0
 ```
 
-The test was last run on commit `59314d99` with gcc version
-`arm-none-eabi-gcc (Fedora 10.2.0-4.fc34) 10.2.0` on a Raspberry Pi
-Pico board.
+The test was last run on commit `19fd300a` with gcc version
+`arm-none-eabi-gcc (Fedora 14.1.0-1.fc40) 14.1.0` on Raspberry Pi
+Pico and Pico 2 boards.
 
 | rp2040               | ticks |
 | -------------------- | ----- |
 | 1 stepper            | 5     |
 | 3 stepper            | 22    |
+
+| rp2350               | ticks |
+| -------------------- | ----- |
+| 1 stepper            | 36    |
+| 3 stepper            | 166   |
 
 ### Linux MCU step rate benchmark
 
@@ -476,7 +481,8 @@ hub.
 | sam4s8c (USB)       | 650K | 8d4a5c16 | arm-none-eabi-gcc (Fedora 7.4.0-1.fc30) 7.4.0 |
 | samd51 (USB)        | 864K | 01d2183f | arm-none-eabi-gcc (Fedora 7.4.0-1.fc30) 7.4.0 |
 | stm32f446 (USB)     | 870K | 01d2183f | arm-none-eabi-gcc (Fedora 7.4.0-1.fc30) 7.4.0 |
-| rp2040 (USB)        | 873K | c5667193 | arm-none-eabi-gcc (Fedora 10.2.0-4.fc34) 10.2.0 |
+| rp2040 (USB)        | 886K | 19fd300a | arm-none-eabi-gcc (Fedora 14.1.0-1.fc40) 14.1.0 |
+| rp2350 (USB)        | 886K | 19fd300a | arm-none-eabi-gcc (Fedora 14.1.0-1.fc40) 14.1.0 |
 
 ## Host Benchmarks
 
