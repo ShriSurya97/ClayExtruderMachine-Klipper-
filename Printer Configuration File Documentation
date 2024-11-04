@@ -1,0 +1,270 @@
+Here’s a structured documentation for the 3D printer configuration file, which provides an overview of each section and parameter’s purpose and usage. This documentation will serve as a guide for understanding the functionality and significance of each configuration setting.
+
+---
+
+### 3D Printer Configuration File Documentation
+
+---
+
+#### 1. **Serial Connection**
+
+Establishes communication between the primary microcontroller (MCU) and the host, as well as secondary (non-critical) MCUs.
+
+```plaintext
+[mcu]
+serial: /dev/serial/by-path/platform-3f980000.usb-usb-0:1.5:1.0-port0
+restart_method: arduino
+```
+- **serial**: Specifies the path for the USB serial connection between the host and the MCU.
+- **restart_method**: Sets the MCU restart method. "arduino" resets the MCU as required by Klipper.
+
+```plaintext
+[mcu mks2]
+serial: /dev/serial/by-path/platform-3f980000.usb-usb-0:1.2:1.0-port0
+is_non_critical: True
+```
+- **is_non_critical**: Marks the second MCU as non-essential, meaning the printer can function even if it is unavailable.
+
+---
+
+#### 2. **Danger Options**
+
+These settings can bypass important safety features and should be used cautiously.
+
+```plaintext
+[danger_options]
+temp_ignore_limits: True
+```
+- **temp_ignore_limits**: If set to `True`, this ignores temperature limit checks, which can be unsafe. 
+
+---
+
+#### 3. **Virtual SD Card Storage**
+
+Configures the virtual SD card location and error handling.
+
+```plaintext
+[virtual_sdcard]
+path: ~/gcode_files
+on_error_gcode: CANCEL_PRINT
+```
+- **path**: Path on the host where gcode files are stored.
+- **on_error_gcode**: G-code command to execute if an error occurs while reading from the virtual SD card.
+
+---
+
+#### 4. **Kinematics and Printer Motion**
+
+Sets up the kinematics type and motion limits for the 3D printer.
+
+```plaintext
+[printer]
+kinematics: corexy
+max_velocity: 300
+max_accel: 1500
+max_z_velocity: 15
+max_z_accel: 500
+square_corner_velocity: 10.0
+```
+- **kinematics**: Specifies the type of kinematics used; "corexy" for a CoreXY printer.
+- **max_velocity**: Maximum travel speed for the X/Y axes (in mm/s).
+- **max_accel**: Maximum acceleration for the X/Y axes (in mm/s²).
+- **max_z_velocity**: Maximum speed for the Z-axis.
+- **max_z_accel**: Maximum acceleration for the Z-axis.
+- **square_corner_velocity**: Maximum speed allowed at sharp corners to reduce jerk.
+
+---
+
+#### 5. **Stepper Motor Configuration**
+
+Configures stepper motor controls, including stepper pins, microstepping, travel limits, and homing speed.
+
+##### X-Axis Stepper Motor
+
+```plaintext
+[stepper_x]
+step_pin: PF0
+dir_pin: !PF1
+enable_pin: !PD7
+microsteps: 16
+rotation_distance: 32
+endstop_pin:^PE5
+position_endstop: -15
+position_min: -15
+position_max: 360
+homing_speed: 30
+```
+- **step_pin, dir_pin, enable_pin**: Pins controlling the stepper motor.
+- **microsteps**: Sets the microstepping level for finer motor resolution.
+- **rotation_distance**: Defines the movement per step, calculated for accurate motion.
+- **endstop_pin**: Specifies the endstop pin with polarity indication.
+- **position_endstop**: Position of the endstop in mm.
+- **position_min, position_max**: Minimum and maximum allowed positions for the X-axis.
+- **homing_speed**: Speed during homing (calibration) process.
+
+##### Y and Z axes are configured similarly with corresponding settings in `[stepper_y]` and `[stepper_z]`.
+
+---
+
+#### 6. **Extruder Configuration**
+
+Configures parameters for the primary extruder, including motor control, heater settings, and PID tuning.
+
+```plaintext
+[extruder]
+step_pin: PA4
+dir_pin: !PA6
+enable_pin: !PA2
+microsteps: 16
+rotation_distance: 32
+nozzle_diameter: 0.4
+filament_diameter: 1.750
+heater_pin: PB4
+sensor_type: ATC Semitec 104GT-2
+sensor_pin: PK7
+max_extrude_only_distance: 500.0
+min_extrude_temp: -273.15
+min_temp: -273.15
+max_temp: 99999999
+control: pid
+pid_Kp: 22.2
+pid_Ki: 1.08
+pid_Kd: 114
+```
+- **step_pin, dir_pin, enable_pin**: Control pins for the extruder motor.
+- **microsteps, rotation_distance**: Precision and movement distance for the extruder stepper.
+- **nozzle_diameter**: Specifies nozzle diameter (in mm).
+- **filament_diameter**: Filament diameter (in mm).
+- **heater_pin**: Pin that controls the extruder heater.
+- **sensor_type**: Thermistor type for temperature measurement.
+- **sensor_pin**: Thermistor connection pin.
+- **min_temp, max_temp**: Temperature safety limits.
+- **control**: PID control for temperature stability.
+- **pid_Kp, pid_Ki, pid_Kd**: PID tuning constants for extruder temperature.
+
+---
+
+#### 7. **Heater Bed Configuration**
+
+Configures bed heating parameters, thermistor settings, and PID constants for stability.
+
+```plaintext
+[heater_bed]
+heater_pin: PH5
+sensor_type: ATC Semitec 104GT-2
+sensor_pin: PK6
+min_temp: 0
+max_temp: 140
+control: pid
+pid_Kp: 325.10
+pid_Ki: 63.35
+pid_Kd: 417.10
+```
+- **heater_pin**: Pin for the bed heater.
+- **sensor_type, sensor_pin**: Thermistor type and connection.
+- **min_temp, max_temp**: Safety limits for bed temperature.
+- **control**: PID control type.
+- **pid_Kp, pid_Ki, pid_Kd**: PID constants for bed temperature stability.
+
+---
+
+#### 8. **Auto Bed Leveling (ABL) Macros**
+
+Defines automated routines for bed leveling, improving print quality by ensuring a flat bed surface.
+
+```plaintext
+[gcode_macro G29]
+gcode:
+    T0
+    BED_MESH_CLEAR
+    BED_MESH_CALIBRATE
+    BED_MESH_PROFILE SAVE=mesh1
+    SAVE_CONFIG NO_RESTART=1
+    BED_MESH_PROFILE LOAD=mesh1
+```
+- **G29 macro**: Automates the bed leveling sequence.
+  - **BED_MESH_CLEAR**: Clears previous leveling data.
+  - **BED_MESH_CALIBRATE**: Initiates calibration.
+  - **BED_MESH_PROFILE SAVE/LOAD**: Saves or loads the calibration profile.
+
+---
+
+#### 9. **Fan Configuration**
+
+Configures a fan, typically for print cooling or electronics cooling.
+
+```plaintext
+[fan]
+pin: PH6
+```
+- **pin**: Pin assigned to the fan.
+
+---
+
+#### 10. **Servo Control**
+
+Sets up a servo motor, often used for tasks like tool changes or probe positioning.
+
+```plaintext
+[servo extruder_servo]
+pin: PD0
+#maximum_servo_angle: 720
+```
+- **pin**: Pin that controls the servo.
+- **maximum_servo_angle**: Sets the servo’s range of movement (commented out, meaning unused here).
+
+---
+
+#### 11. **G-Code Macros**
+
+Defines shortcuts for frequently used sequences, such as tool changes or bed leveling.
+
+```plaintext
+[gcode_macro T0]
+gcode:
+    SET_SERVO SERVO=extruder_servo angle=-20
+    SET_GCODE_OFFSET Z=0 MOVE=1
+    SET_GCODE_OFFSET X=0
+    ACTIVATE_EXTRUDER EXTRUDER=extruder
+```
+- **T0 macro**: Defines tool change to primary extruder.
+  - **SET_SERVO**: Sets servo angle.
+  - **SET_GCODE_OFFSET**: Adjusts Z/X offsets for tool alignment.
+  - **ACTIVATE_EXTRUDER**: Activates specified extruder.
+
+---
+
+#### 12. **Idle Timeout**
+
+Controls printer’s idle time before automatic shutdown or standby.
+
+```plaintext
+[idle_timeout]
+timeout: 2400
+```
+- **timeout**: Time in seconds before printer idles.
+
+---
+
+#### 13. **TMC2209 Stepper Driver Configuration (UART)**
+
+Configures the Trinamic TMC2209 stepper driver for silent and precise motor control via UART.
+
+```plaintext
+[tmc2209 stepper_x]
+uart_pin: PK1
+interpolate: True
+run_current: 1.0
+hold_current: 0.5
+sense_resistor: 0.110
+stealthchop_threshold: 0
+```
+- **uart_pin**: UART pin for TMC2209 driver communication.
+- **interpolate**: Smoothens motion by interpolation.
+- **run_current, hold_current**: Motor current settings for running and holding.
+- **sense_resistor**: Resistance for current sensing.
+- **stealthchop_threshold**: Threshold for enabling StealthChop mode.
+
+---
+
+###
